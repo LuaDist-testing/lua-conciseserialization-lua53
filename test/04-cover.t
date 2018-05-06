@@ -2,7 +2,7 @@
 
 require 'Test.More'
 
-plan(33)
+plan(35)
 
 local c = require 'CBOR'
 
@@ -19,7 +19,7 @@ is( c.decode(c.SIMPLE(42)), 42, "simple 42" )
 c.set_nil'null'
 is( c.decode(c.encode(nil)), nil, "nil" )
 
-c.set_number'single_float'
+c.set_float'single'
 local nan = c.decode(c.encode(0/0))
 type_ok( nan, 'number', "nan" )
 ok( nan ~= nan )
@@ -27,7 +27,7 @@ is( c.decode(c.encode(3.140625)), 3.140625, "3.140625" )
 is( c.decode(c.encode(-2)), -2, "neg -2" )
 is( c.decode(c.encode(42)), 42, "pos 42" )
 
-c.set_number'half_float'
+c.set_float'half'
 nan = c.decode(c.encode(0/0))
 type_ok( nan, 'number', "nan" )
 ok( nan ~= nan )
@@ -71,3 +71,10 @@ is_deeply( c.decode(c.encode(h)), h, "#h 2^9" )
 for i = 1, 2^17 do h[10*i] = 'x' end
 is_deeply( c.decode(c.encode(h)), h, "#h 2^17" )
 
+if utf8 then
+    c.set_string'check_utf8'
+    is( c.encode("\x4F"):byte(), c.TEXT_STRING(1):byte(), "text" )
+    is( c.encode("\xFF"):byte(), c.BYTE_STRING(1):byte(), "byte" )
+else
+    skip("no utf8", 2)
+end

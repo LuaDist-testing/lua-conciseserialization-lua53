@@ -30,8 +30,7 @@ It's developed for Lua 5.1, 5.2 & 5.3. There are 2 variants:
 
 ## Download
 
-lua-ConciseSerialization source can be downloaded from
-[GitHub](http://github.com/fperrad/lua-ConciseSerialization/releases/).
+The sources are hosted on [GitHub](http://github.com/fperrad/lua-ConciseSerialization).
 
 ## Installation
 

@@ -20,16 +20,13 @@ local pack = require'string'.pack
 local unpack = require'string'.unpack
 local utf8_len = require'utf8'.len
 
---[[ debug only
-local function hexadump (s)
-    return (s:gsub('.', function (c) return format('%02X ', c:byte()) end))
-end
---]]
-
 local _ENV = nil
 local m = {}
 
 --[[ debug only
+local function hexadump (s)
+    return (s:gsub('.', function (c) return format('%02X ', c:byte()) end))
+end
 m.hexadump = hexadump
 --]]
 
@@ -98,7 +95,20 @@ local function encode_unsigned (n, major)
     end
 end
 
+coders['integer'] = function (buffer, n)
+    if n >= 0 then
+        buffer[#buffer+1] = encode_unsigned(n, 0x00)
+    else
+        buffer[#buffer+1] = encode_unsigned(-1 - n, 0x20)
+    end
+end
+
 m.OPEN_BYTE_STRING = char(0x5F)
+
+m.BYTE_STRING = function (n)
+    checkunsigned('BYTE_STRING', 1, n)
+    return encode_unsigned(n, 0x40)
+end
 
 coders['byte_string'] = function (buffer, str)
     buffer[#buffer+1] = encode_unsigned(#str, 0x40)
@@ -107,10 +117,12 @@ end
 
 m.OPEN_TEXT_STRING = char(0x7F)
 
+m.TEXT_STRING = function (n)
+    checkunsigned('TEXT_STRING', 1, n)
+    return encode_unsigned(n, 0x60)
+end
+
 coders['text_string'] = function (buffer, str)
-    if not utf8_len(str) then
-        error("invalid UTF-8 string")
-    end
     buffer[#buffer+1] = encode_unsigned(#str, 0x60)
     buffer[#buffer+1] = str
 end
@@ -118,10 +130,16 @@ end
 local function set_string (option)
     if option == 'byte_string' then
         coders['string'] = coders['byte_string']
-        m.OPEN_STRING = m.OPEN_BYTE_STRING
     elseif option == 'text_string' then
         coders['string'] = coders['text_string']
-        m.OPEN_STRING = m.OPEN_TEXT_STRING
+    elseif option == 'check_utf8' then
+        coders['string'] = function (buffer, str)
+            if utf8_len(str) then
+                coders['text_string'](buffer, str)
+            else
+                coders['byte_string'](buffer, str)
+            end
+        end
     else
         argerror('set_string', 1, "invalid option '" .. option .."'")
     end
@@ -176,9 +194,9 @@ local function set_array (option)
                 is_map = true
             end
             if is_map then
-                return coders['map'](buffer, tbl, n)
+                coders['map'](buffer, tbl, n)
             else
-                return coders['array'](buffer, tbl, n)
+                coders['array'](buffer, tbl, n)
             end
         end
     elseif option == 'with_hole' then
@@ -195,9 +213,9 @@ local function set_array (option)
                 n = n + 1
             end
             if is_map then
-                return coders['map'](buffer, tbl, n)
+                coders['map'](buffer, tbl, n)
             else
-                return coders['array'](buffer, tbl, max)
+                coders['array'](buffer, tbl, max)
             end
         end
     elseif option == 'always_as_map' then
@@ -206,7 +224,7 @@ local function set_array (option)
             for _ in pairs(tbl) do
                 n = n + 1
             end
-            return coders['map'](buffer, tbl, n)
+            coders['map'](buffer, tbl, n)
         end
     else
         argerror('set_array', 1, "invalid option '" .. option .."'")
@@ -215,7 +233,7 @@ end
 m.set_array = set_array
 
 coders['table'] = function (buffer, tbl)
-    return coders['_table'](buffer, tbl)
+    coders['_table'](buffer, tbl)
 end
 
 local function TAG (n)
@@ -274,49 +292,35 @@ local function set_nil (option)
 end
 m.set_nil = set_nil
 
-local function set_number (option)
-    if option == 'half_float' then
-        coders['number'] = function (buffer, n)
-            if math_type(n) == 'integer' then
-                if n >= 0 then
-                    buffer[#buffer+1] = encode_unsigned(n, 0x00)
-                else
-                    buffer[#buffer+1] = encode_unsigned(-1 - n, 0x20)
-                end
-            else
-                buffer[#buffer+1] = char(0xF9)
-                buffer[#buffer+1] = pack_half_float(n)
-            end
-        end
-    elseif option == 'single_float' then
-        coders['number'] = function (buffer, n)
-            if math_type(n) == 'integer' then
-                if n >= 0 then
-                    buffer[#buffer+1] = encode_unsigned(n, 0x00)
-                else
-                    buffer[#buffer+1] = encode_unsigned(-1 - n, 0x20)
-                end
-            else
-                buffer[#buffer+1] = pack('>Bf', 0xFA, n)
-            end
-        end
-    elseif option == 'double_float' then
-        coders['number'] = function (buffer, n)
-            if math_type(n) == 'integer' then
-                if n >= 0 then
-                    buffer[#buffer+1] = encode_unsigned(n, 0x00)
-                else
-                    buffer[#buffer+1] = encode_unsigned(-1 - n, 0x20)
-                end
-            else
-                buffer[#buffer+1] = pack('>Bd', 0xFB, n)
-            end
-        end
+coders['half'] = function (buffer, n)
+    buffer[#buffer+1] = char(0xF9)
+    buffer[#buffer+1] = pack_half_float(n)
+end
+
+coders['single'] = function (buffer, n)
+    buffer[#buffer+1] = pack('>Bf', 0xFA, n)
+end
+
+coders['double'] = function (buffer, n)
+    buffer[#buffer+1] = pack('>Bd', 0xFB, n)
+end
+
+local function set_float (option)
+    if option == 'half' then
+        coders['float'] = coders['half']
+    elseif option == 'single' then
+        coders['float'] = coders['single']
+    elseif option == 'double' then
+        coders['float'] = coders['double']
     else
-        argerror('set_number', 1, "invalid option '" .. option .."'")
+        argerror('set_float', 1, "invalid option '" .. option .."'")
     end
 end
-m.set_number = set_number
+m.set_float = set_float
+
+coders['number'] = function (buffer, n)
+    coders[math_type(n)](buffer, n)
+end
 
 function m.encode (data)
     local buffer = {}
@@ -713,16 +717,16 @@ if #pack('n', 0.0) == 4 then
     for i = 0x1B, 0xFB, 0x20 do
         decoders[i] = nil       -- 64 bits
     end
-    set_number'single_float'
+    set_float'single'
 else
     m.full64bits = true
-    set_number'double_float'
+    set_float'double'
     if #pack('n', 0.0) > 8 then
         m.long_double = true
     end
 end
 
-m._VERSION = '0.1.0'
+m._VERSION = '0.1.1'
 m._DESCRIPTION = "lua-ConciseSerialization : a pure Lua 5.3 implementation of CBOR / RFC7049"
 m._COPYRIGHT = "Copyright (c) 2016 Francois Perrad"
 return m

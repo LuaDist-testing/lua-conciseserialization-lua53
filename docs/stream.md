@@ -35,14 +35,12 @@ s:write(c.BREAK)
 ```lua
 local c = require'CBOR'
 
-s:write(c.OPEN_STRING)
+s:write(c.OPEN_TEXT_STRING)     -- or c.OPEN_BYTE_STRING
 ...
 s:write(c.encode(string_chunk))
 ...
 s:write(c.BREAK)
 ```
-
-`OPEN_STRING` is an alias of `OPEN_BYTE_STRING` or of `OPEN_TEXT_STRING` following `set_string`.
 
 ## Receiver
 

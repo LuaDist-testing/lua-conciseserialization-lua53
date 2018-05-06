@@ -28,7 +28,7 @@ c.register_tag(TAG_BASE64, function (str)
     return b64.decode(str)
 end)
 
-is( c.encode('STR'):byte(), 0x60 + 3, "text string" )
+is( c.encode('STR'):byte(), c.TEXT_STRING(3):byte(), "text string" )
 eq_array( {c.encode(BASE64'STR'):byte(1, 2)}, {0xD8, TAG_BASE64}, "tag 34" )
 
 local t = { 'encoded_as_string', BASE64'encoded_base64' }

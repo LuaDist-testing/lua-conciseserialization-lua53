@@ -21,7 +21,7 @@ local nan = c.decode(c.encode(0.0/0.0))
 type_ok( nan, 'number', "nan" )
 ok( nan ~= nan )
 
-is( c.encode{}:byte(), 0x80, "empty table as array" )
+is( c.encode{}:byte(), c.ARRAY(0):byte(), "empty table as array" )
 
 local t = setmetatable( { 'a', 'b', 'c' }, { __index = { [4] = 'd' } } )
 is( t[4], 'd' )
@@ -54,7 +54,7 @@ is( c.encode(t):byte(), c.ARRAY(0):byte(), "empty table as array" )
 c.set_array'always_as_map'
 is( c.encode(t):byte(), c.MAP(0):byte(), "empty table as map" )
 
-c.set_number'half_float'
+c.set_float'half'
 is( c.encode(65536.1), c.encode(1.0/0.0), "half 65536.1")
 is( c.encode(66666.6), c.encode(1.0/0.0), "inf (downcast double -> half)")
 is( c.encode(-66666.6), c.encode(-1.0/0.0), "-inf (downcast double -> half)")
@@ -63,7 +63,7 @@ is( c.decode(c.encode(-66666.6)), -1.0/0.0, "-inf (downcast double -> half)")
 is( c.decode(c.encode(7e-6)), 0.0, "epsilon (downcast double -> half)")
 is( c.decode(c.encode(-7e-6)), -0.0, "-epsilon (downcast double -> half)")
 
-c.set_number'single_float'
+c.set_float'single'
 is( c.encode(3.402824e+38), c.encode(1.0/0.0), "float 3.402824e+38")
 is( c.encode(7e42), c.encode(1.0/0.0), "inf (downcast double -> float)")
 is( c.encode(-7e42), c.encode(-1.0/0.0), "-inf (downcast double -> float)")
@@ -72,7 +72,7 @@ is( c.decode(c.encode(-7e42)), -1.0/0.0, "-inf (downcast double -> float)")
 is( c.decode(c.encode(7e-46)), 0.0, "epsilon (downcast double -> float)")
 is( c.decode(c.encode(-7e-46)), -0.0, "-epsilon (downcast double -> float)")
 
-c.set_number'double_float'
+c.set_float'double'
 if c.long_double then
     is( c.encode(7e400), c.encode(1.0/0.0), "inf (downcast long double -> double)")
     is( c.encode(-7e400), c.encode(-1.0/0.0), "-inf (downcast long double -> double)")

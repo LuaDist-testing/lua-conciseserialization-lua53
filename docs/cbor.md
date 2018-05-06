@@ -24,9 +24,8 @@ the _interesting_ value is the second.
 #### set_string( str )
 
 Configures the behaviour of `encode`.
-The valid options are `'byte_string'` and `'text_string'`.
+The valid options are `'byte_string'`, `'text_string'` and `'check_utf8'` (only if Lua 5.3).
 The default is `'text_string'`.
-With Lua 5.3, `'text_string'` implies a valid UTF-8 string.
 
 #### set_array( str )
 
@@ -40,11 +39,11 @@ Configures the behaviour of `encode`.
 The valid options are `'null'` and `'undef'`.
 The default is `'undef'`.
 
-#### set_number( str )
+#### set_float( str )
 
 Configures the behaviour of `encode`.
-The valid options are `'half_float'`, `'single_float'` and `'double_float'`.
-The default is _usually_ `'double_float'`.
+The valid options are `'half'`, `'single'` and `'double'`.
+The default is _usually_ `'double'`.
 
 #### register_tag( tag, builder )
 
@@ -57,7 +56,7 @@ Registers a function `builder` which will be called for a tagged value.
   `nil`, `boolean`, `number`, `string` and `table`.
 - A __Lua__ `number` is converted into an __CBOR__ `integer`
   if `math.floor(num) == num`, otherwise it is converted
-  into the __CBOR__ `float` or `double` (see `set_number`).
+  into the __CBOR__  `half` or `single` or `double` (see `set_float`).
 - When a __CBOR__ 64 bits `integer` is converted to a __Lua__ `number`
   it is possible that the resulting number will not represent the original number but just an approximation.
 - A __Lua__ `table` is converted into a __CBOR__ `array`
@@ -79,7 +78,7 @@ Registers a function `builder` which will be called for a tagged value.
 ```lua
 local c = require 'CBOR'
 
-c.set_number'single_float'
+c.set_float'single'
 c.set_nil'null'
 c.set_array'with_hole'
 c.set_string'text_string'

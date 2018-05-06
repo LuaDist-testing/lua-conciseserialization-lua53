@@ -1,17 +1,17 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = 'lua-ConciseSerialization-lua53'
-version = '0.1.0-1'
+version = '0.1.1-1'
 -- LuaDist source
 source = {
-  tag = "0.1.0-1",
+  tag = "0.1.1-1",
   url = "git://github.com/LuaDist-testing/lua-conciseserialization-lua53.git"
 }
 -- Original source
 -- source = {
---     url = 'http://github.com/fperrad/fperrad.github.io/raw/master/dist/lua-conciseserialization-0.1.0.tar.gz',
---     md5 = 'd5fbcc58bdaa0ed6399b18ebd068f56f',
---     dir = 'lua-ConciseSerialization-0.1.0',
+--     url = 'http://github.com/fperrad/lua-ConciseSerialization/raw/releases/lua-conciseserialization-0.1.1.tar.gz',
+--     md5 = '8d415a77d830ef77e27fd1a3a1305407',
+--     dir = 'lua-ConciseSerialization-0.1.1',
 -- }
 description = {
     summary = "a pure Lua implementation of CBOR / RFC7049",

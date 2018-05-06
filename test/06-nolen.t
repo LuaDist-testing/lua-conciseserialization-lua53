@@ -69,13 +69,13 @@ error_like(function ()
            end,
            "unexpected BREAK" )
 
-s = c.OPEN_STRING
+s = c.OPEN_TEXT_STRING
  .. c.encode('strea')
  .. c.encode('ming')
  .. c.BREAK
 is(c.decode(s), 'streaming', "indefinite-length string")
 
-s = c.OPEN_STRING
+s = c.OPEN_TEXT_STRING
  .. c.encode('strea')
  .. c.encode(2)
  .. c.encode('ming')

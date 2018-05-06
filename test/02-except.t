@@ -2,7 +2,7 @@
 
 require 'Test.More'
 
-plan(31)
+plan(30)
 
 local c = require 'CBOR'
 
@@ -22,9 +22,9 @@ error_like( function ()
             "bad argument #1 to set_nil %(invalid option 'bad'%)" )
 
 error_like( function ()
-                c.set_number'bad'
+                c.set_float'bad'
             end,
-            "bad argument #1 to set_number %(invalid option 'bad'%)" )
+            "bad argument #1 to set_float %(invalid option 'bad'%)" )
 
 error_like( function ()
                 c.register_tag(2.5, print)
@@ -144,11 +144,6 @@ error_like( function ()
 
 if utf8 then
     error_like( function ()
-                    c.encode("\xBB")
-                end,
-                "invalid UTF%-8 string" )
-
-    error_like( function ()
                     c.decode("\x61\xBB")
                 end,
                 "invalid UTF%-8 string" )
@@ -156,5 +151,5 @@ if utf8 then
     c.strict = false
     is( c.decode("\x61\xBB"), "\xBB", "invalid utf8" )
 else
-    skip("no utf8", 3)
+    skip("no utf8", 2)
 end

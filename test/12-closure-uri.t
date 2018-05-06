@@ -18,7 +18,7 @@ local function URI (str)
     end
 end
 
-is( c.encode('STR'):byte(), 0x60 + 3, "text string" )
+is( c.encode('STR'):byte(), c.TEXT_STRING(3):byte(), "text string" )
 eq_array( {c.encode(URI'STR'):byte(1, 2)}, {0xD8, TAG_URI}, "tag 32" )
 
 local t = { 'http://www.lua.org', URI'http://www.luarocks.org' }
