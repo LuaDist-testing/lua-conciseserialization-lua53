@@ -1,0 +1,12 @@
+site_name: lua-ConciseSerialization
+site_description: CBOR RFC7049
+site_author: François Perrad
+repo_url: https://github.com/fperrad/lua-ConciseSerialization
+pages:
+- Home: index.md
+- API: cbor.md
+- Manual:
+  - Stream: stream.md
+  - Tag: tag.md
+theme: mkdocs
+copyright: Copyright &copy; 2016 Fran&ccedil;ois Perrad
