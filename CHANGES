@@ -1,0 +1,13 @@
+Revision history for lua-ConciseSerialization
+
+0.2.0  Fri Mar 10 18:30:00 2017
+	export decode_cursor instead of decoders
+
+0.1.1  Tue Dec  6 15:30:00 2016
+	remove OPEN_STRING
+	add set_string'check_utf8'
+	rename set_number to set_float
+
+0.1.0  Fri Dec  2 17:00:00 2016
+	First release
+
