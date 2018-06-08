@@ -149,7 +149,10 @@ local function pack_double_float(n)
 end
 
 local coders = setmetatable({}, {
-    __index = function (t, k) error("encode '" .. k .. "' is unimplemented") end
+    __index = function (t, k)
+        if k == 1 then return end   -- allows ipairs (Lua 5.3)
+        error("encode '" .. k .. "' is unimplemented")
+    end
 })
 m.coders = coders
 
@@ -781,7 +784,7 @@ for k, v in pairs(direct_small) do
     end
 end
 setmetatable(decoders, {
-    __index = function (t, k) error("decode '" .. format('0x%X', k) .. "' is unimplemented") end
+    __index = function (t, k) error("decode '" .. format('%#x', k) .. "' is unimplemented") end
 })
 
 local function cursor_string (str)
@@ -821,7 +824,7 @@ function m.decode (s)
     checktype('decode', 1, s, 'string')
     local cursor = cursor_string(s)
     local data = decode_cursor(cursor)
-    if cursor.i < cursor.j then
+    if cursor.i <= cursor.j then
         error "extra bytes"
     end
     return data
@@ -871,9 +874,9 @@ else
     end
 end
 
-m._VERSION = '0.2.0'
+m._VERSION = '0.2.1'
 m._DESCRIPTION = "lua-ConciseSerialization : a pure Lua implementation of CBOR / RFC7049"
-m._COPYRIGHT = "Copyright (c) 2016-2017 Francois Perrad"
+m._COPYRIGHT = "Copyright (c) 2016-2018 Francois Perrad"
 return m
 --
 -- This library is licensed under the terms of the MIT/X11 license,

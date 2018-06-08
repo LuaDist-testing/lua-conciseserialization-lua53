@@ -1,5 +1,10 @@
 Revision history for lua-ConciseSerialization
 
+0.2.1  Sat Jan 20 19:30:00 2018
+	fix extra bytes detection
+	allows ipairs(c.coders)
+	add Debian package infrastructure
+
 0.2.0  Fri Mar 10 18:30:00 2017
 	export decode_cursor instead of decoders
 

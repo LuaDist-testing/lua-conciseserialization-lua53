@@ -2,7 +2,7 @@
 
 require 'Test.More'
 
-plan(30)
+plan(32)
 
 local c = require 'CBOR'
 
@@ -107,7 +107,7 @@ error_like( function ()
 error_like( function ()
                 c.decode(string.char(0x1C))
             end,
-            "decode '0x1C' is unimplemented" )
+            "decode '0x1c' is unimplemented" )
 
 is( c.decode(c.encode("text")), "text" )
 
@@ -118,6 +118,11 @@ error_like( function ()
 
 error_like( function ()
                 c.decode(c.encode("text") .. "more")
+            end,
+            "extra bytes" )
+
+error_like( function ()
+                c.decode(c.encode("text") .. "1")
             end,
             "extra bytes" )
 
@@ -153,3 +158,8 @@ if utf8 then
 else
     skip("no utf8", 2)
 end
+
+lives_ok( function ()
+                for _ in ipairs(c.coders) do end
+          end,
+          "cannot iterate packers" )

@@ -4,7 +4,7 @@ VERSION := $(shell cd src && $(LUA) -e "m = require [[CBOR]]; print(m._VERSION)"
 TARBALL := lua-conciseserialization-$(VERSION).tar.gz
 REV     := 1
 
-LUAVER  := 5.1
+LUAVER  := 5.2
 PREFIX  := /usr/local
 DPREFIX := $(DESTDIR)$(PREFIX)
 LIBDIR  := $(DPREFIX)/share/lua/$(LUAVER)
@@ -36,6 +36,7 @@ my @files = qw{ \
 while (<>) { \
     chomp; \
     next if m{^\.}; \
+    next if m{^debian/}; \
     next if m{^rockspec/}; \
     next if m{^test/test-vectors$$}; \
     push @files, $$_; \
@@ -88,6 +89,14 @@ rock:
 	luarocks pack rockspec/lua-conciseserialization-$(VERSION)-$(REV).rockspec
 	luarocks pack rockspec/lua-conciseserialization-lua53-$(VERSION)-$(REV).rockspec
 
+deb:
+	echo "lua-conciseserialization ($(shell git describe --dirty)) unstable; urgency=medium" >  debian/changelog
+	echo ""                         >> debian/changelog
+	echo "  * UNRELEASED"           >> debian/changelog
+	echo ""                         >> debian/changelog
+	echo " -- $(shell git config --get user.name) <$(shell git config --get user.email)>  $(shell date -R)" >> debian/changelog
+	fakeroot debian/rules clean binary
+
 check: test
 
 test/test-vectors/appendix_a.json:
@@ -115,7 +124,7 @@ coverage:
 coveralls:
 	rm -f src/luacov.stats.out src/luacov.report.out
 	cd $(SRC) && prove --exec="$(LUA) -lluacov" ../test/*.t
-	cd $(SRC) && luacov-coveralls -e ^/usr -e %.t$
+	cd $(SRC) && luacov-coveralls -e /HERE/ -e %.t$
 
 README.html: README.md
 	Markdown.pl README.md > README.html
@@ -128,5 +137,5 @@ clean:
 
 realclean: clean
 
-.PHONY: test rockspec CHANGES
+.PHONY: test rockspec deb CHANGES
 
