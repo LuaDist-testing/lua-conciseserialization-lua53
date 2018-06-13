@@ -1,15 +1,15 @@
 -- This file was automatically generated for the LuaDist project.
 
 package = 'lua-ConciseSerialization-lua53'
-version = '0.2.1-1'
+version = '0.2.1-2'
 -- LuaDist source
 source = {
-  tag = "0.2.1-1",
-  url = "git://github.com/LuaDist-testing/lua-conciseserialization-lua53.git"
+  url = "git://github.com/LuaDist-testing/lua-conciseserialization-lua53.git",
+  tag = "0.2.1-2"
 }
 -- Original source
 -- source = {
---     url = 'http://github.com/fperrad/lua-ConciseSerialization/raw/releases/lua-conciseserialization-0.2.1.tar.gz',
+--     url = 'https://framagit.org/fperrad/lua-ConciseSerialization/raw/releases/lua-conciseserialization-0.2.1.tar.gz',
 --     md5 = 'e0fc87c1796b044c8af73f522cbc95c8',
 --     dir = 'lua-ConciseSerialization-0.2.1',
 -- }
@@ -23,7 +23,7 @@ negotiation.
 
 It's a pure Lua implementation, without dependency.
     ]],
-    homepage = 'http://fperrad.github.io/lua-ConciseSerialization/',
+    homepage = 'http://fperrad.frama.io/lua-ConciseSerialization/',
     maintainer = 'Francois Perrad',
     license = 'MIT/X11'
 }
